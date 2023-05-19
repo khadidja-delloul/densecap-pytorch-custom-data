@@ -9,33 +9,37 @@ import numpy as np
 
 """
 Modified from https://github.com/jcjohnson/densecap/blob/master/preprocess.py
-
-Format in region_descriptions.json
-{
-  "id": [int], Unique identifier for this image,
-  "regions": [
+    Format in region_descriptions.json
     {
-      "id": [int] Unique identifier for this region,
-      "image": [int] ID of the image to which this region belongs,
-      "height": [int] Height of the region in pixels,
-      "width": [int] Width of the region in pixels,
-      "phrase": [string] Caption for this region,
-      "x": [int] x-coordinate of the upper-left corner of the region,
-      "y": [int] y-coordinate of the upper-left corner of the region,
-    },
-    ...
-  ]
-}
-
-Format in image_data.json
-  {
-    "image_id": [int] Unique identifier for this image,
-    "url": [str] Visual Genome-hosted image URL
-    "width": [int] Width of the image in pixels,
-    "height": [int] Height of the image in pixels,
-    "coco_id": [int] ID of the image in the coco dataset
-    "flickr_id": [int] ID of the image in the flickr dataset
-  }
+    "images": [
+      "id": [int], Unique identifier for this image,
+      "regions": [
+        {
+          "id": [int] Unique identifier for this region,
+          "image": [int] ID of the image to which this region belongs,
+          "phrase": [string] Caption for this region,
+          "points_number": [int] the number of points surrounding the region
+          "points": [
+            {
+              "x": [int] x-coordinate of the point,
+              "y": [int] y-coordinate of the point,
+            }
+            ...
+          ]
+        },
+        ...
+      ]
+    ]
+    }
+    
+    Format in image_data.json
+    {
+    "images": [
+        "image_id": [int] Unique identifier for this image
+        "path": [string] directory path
+    ]
+    }
+    
 
 
 We assume that all images are on disk in a two folder (VG_100K and VG_100K_2), and that
