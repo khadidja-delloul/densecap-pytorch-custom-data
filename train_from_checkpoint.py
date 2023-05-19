@@ -127,6 +127,16 @@ def train(args):
     iter_counter = 0
     best_map = 0.
     results = -1
+    
+    # checkpoint = torch.load(PATH)
+    # model.load_state_dict(checkpoint['model'])
+    # optimizer.load_state_dict(checkpoint['optimizer'])
+    # iter_counter = checkpoint['iterations']
+    # results = checkpoint['results_on_val']
+    # best_loss = 4.661
+    # print(iter_counter)
+    
+    
     # use tensorboard to track the loss
     if USE_TB:
         writer = SummaryWriter()
