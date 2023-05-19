@@ -1,7 +1,7 @@
 import torch
 from tqdm import tqdm
 
-from utils.data_loader import DenseCapDataset, DataLoaderPFG
+from utils.data_loader import TheatreDataset, TheatreDataLoaderPFG
 from model.evaluator import DenseCapEvaluator
 
 
