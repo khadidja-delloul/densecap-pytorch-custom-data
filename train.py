@@ -134,7 +134,6 @@ def train(args):
     for epoch in range(MAX_EPOCHS):
 
         for batch, (img, targets, info) in enumerate(train_loader):
-
             img = [img_tensor.to(device) for img_tensor in img]
             targets = [{k:v.to(device) for k, v in target.items()} for target in targets]
 
