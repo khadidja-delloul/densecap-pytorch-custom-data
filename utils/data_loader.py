@@ -9,13 +9,12 @@ from PIL import Image
 from torch.utils.data import DataLoader
 from prefetch_generator import BackgroundGenerator
 
-
 __all__ = [
-    "DataLoaderPFG", "DenseCapDataset", 'DenseCapDatasetV2'
+    "TheatreDataLoaderPFG", "TheatreDataset"
 ]
 
 
-class DataLoaderPFG(DataLoader):
+class TheatreDataLoaderPFG(DataLoader):
     """
     Prefetch version of DataLoader: https://github.com/IgorSusmelj/pytorch-styleguide/issues/5
     """
@@ -24,7 +23,7 @@ class DataLoaderPFG(DataLoader):
         return BackgroundGenerator(super().__iter__())
 
 
-class DenseCapDataset(Dataset):
+class TheatreDataset(Dataset):
     """Images are loaded from by open specific file
     """
 
@@ -33,7 +32,7 @@ class DenseCapDataset(Dataset):
         """Use in torch.utils.data.DataLoader
         """
 
-        return tuple(zip(*batch)) # as tuples instead of stacked tensors
+        return tuple(zip(*batch))  # as tuples instead of stacked tensors
 
     @staticmethod
     def get_transform():
@@ -47,66 +46,79 @@ class DenseCapDataset(Dataset):
 
         return transform
 
-    def __init__(self, img_dir_root, vg_data_path, look_up_tables_path, dataset_type=None, transform=None):
+    def __init__(self, img_dir_root, theatre_data_path, depth_img_dir_root, look_up_tables_path, dataset_type=None,
+                 transform=None):
 
         assert dataset_type in {None, 'train', 'test', 'val'}
 
-        super(DenseCapDataset, self).__init__()
+        super(TheatreDataset, self).__init__()
 
         self.img_dir_root = img_dir_root
-        self.vg_data_path = vg_data_path
+        self.theatre_data_path = theatre_data_path
+        self.depth_img_dir_root = depth_img_dir_root
         self.look_up_tables_path = look_up_tables_path
-        self.dataset_type = dataset_type  # if dataset_type is None, all data will be use
+        self.dataset_type = dataset_type  # if dataset_type is None, all data will be used
         self.transform = transform
 
         # === load data here ====
         self.look_up_tables = pickle.load(open(look_up_tables_path, 'rb'))
 
-    def set_dataset_type(self, dataset_type, verbose=True):
-
-        assert dataset_type in {None, 'train', 'test', 'val'}
-
-        if verbose:
-            print('[DenseCapDataset]: {} switch to {}'.format(self.dataset_type, dataset_type))
-
-        self.dataset_type = dataset_type
+    # def set_dataset_type(self, dataset_type, verbose=True):
+    #
+    #     assert dataset_type in {None, 'train', 'test', 'val'}
+    #
+    #     if verbose:
+    #         print('[TheatreDataset]: {} switch to {}'.format(self.dataset_type, dataset_type))
+    #
+    #     self.dataset_type = dataset_type
 
     def __getitem__(self, idx):
 
-        with h5py.File(self.vg_data_path, 'r') as vg_data:
+        with h5py.File(self.theatre_data_path, 'r') as theatre_data:
 
-            vg_idx = self.look_up_tables['split'][self.dataset_type][idx] if self.dataset_type else idx
+            theatre_idx = idx
 
-            img_path = os.path.join(self.img_dir_root, self.look_up_tables['idx_to_directory'][vg_idx],
-                                    self.look_up_tables['idx_to_filename'][vg_idx])
+            img_path = os.path.join(self.img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
+                                    self.look_up_tables['idx_to_filename'][theatre_idx])
+
+            depth_path = os.path.join(self.depth_img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
+                                      self.look_up_tables['idx_to_filename'][theatre_idx])
 
             img = Image.open(img_path).convert("RGB")
+#             depth_path = depth_path.replace("jpg", "jpeg")
+#             depth = Image.open(depth_path)
+
             if self.transform is not None:
                 img = self.transform(img)
             else:
                 img = transforms.ToTensor()(img)
+#                 depth = transforms.ToTensor()(depth)
 
-            first_box_idx = vg_data['img_to_first_box'][vg_idx]
-            last_box_idx = vg_data['img_to_last_box'][vg_idx]
+            first_region_idx = theatre_data['img_to_first_region'][theatre_idx]
+            last_region_idx = theatre_data['img_to_last_region'][theatre_idx]
 
-            boxes = torch.as_tensor(vg_data['boxes'][first_box_idx: last_box_idx+1], dtype=torch.float32)
-            caps = torch.as_tensor(vg_data['captions'][first_box_idx: last_box_idx+1], dtype=torch.long)
-            caps_len = torch.as_tensor(vg_data['lengths'][first_box_idx: last_box_idx+1], dtype=torch.long)
+            regions = torch.as_tensor(theatre_data['regions'][first_region_idx: last_region_idx + 1],
+                                      dtype=torch.float32)
+            caps = torch.as_tensor(theatre_data['captions'][first_region_idx: last_region_idx + 1], dtype=torch.long)
+            caps_len = torch.as_tensor(theatre_data['lengths'][first_region_idx: last_region_idx + 1], dtype=torch.long)
 
             targets = {
-                'boxes': boxes,
+                'regions': regions,
                 'caps': caps,
                 'caps_len': caps_len,
             }
 
             info = {
-                'idx': vg_idx,
-                'dir': self.look_up_tables['idx_to_directory'][vg_idx],
-                'file_name': self.look_up_tables['idx_to_filename'][vg_idx]
+                'idx': theatre_idx,
+                'dir': self.look_up_tables['idx_to_directory'][theatre_idx],
+                'file_name': self.look_up_tables['idx_to_filename'][theatre_idx]
             }
 
+#         return torch.cat((img, depth)), targets, info
         return img, targets, info
-
+    
+    
+    
     def __len__(self):
 
         if self.dataset_type:
@@ -115,90 +127,4 @@ class DenseCapDataset(Dataset):
             return len(self.look_up_tables['filename_to_idx'])
 
 
-class DenseCapDatasetV2(Dataset):
-    """Images are stored in VG-regions.h5
-    """
 
-    @staticmethod
-    def collate_fn(batch):
-        """Use in torch.utils.data.DataLoader
-        """
-
-        return tuple(zip(*batch)) # as tuples instead of stacked tensors
-
-    @staticmethod
-    def get_transform():
-        """More complicated transform utils in torchvison/references/detection/transforms.py
-        """
-
-        transform = transforms.Compose([
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        ])
-
-        return transform
-
-    def __init__(self, vg_data_path, look_up_tables_path, dataset_type=None, transform=None):
-
-        assert dataset_type in {None, 'train', 'test', 'val'}
-
-        super(DenseCapDatasetV2, self).__init__()
-
-        self.vg_data_path = vg_data_path
-        self.look_up_tables_path = look_up_tables_path
-        self.dataset_type = dataset_type  # if dataset_type is None, all data will be use
-        self.transform = transform
-
-        # === load data here ====
-        self.look_up_tables = pickle.load(open(look_up_tables_path, 'rb'))
-
-    def set_dataset_type(self, dataset_type, verbose=True):
-
-        assert dataset_type in {None, 'train', 'test', 'val'}
-
-        if verbose:
-            print('[DenseCapDataset]: {} switch to {}'.format(self.dataset_type, dataset_type))
-
-        self.dataset_type = dataset_type
-
-    def __getitem__(self, idx):
-
-        with h5py.File(self.vg_data_path, 'r') as vg_data:
-
-            vg_idx = self.look_up_tables['split'][self.dataset_type][idx] if self.dataset_type else idx
-
-            img = vg_data['images'][vg_idx]
-            h = vg_data['image_heights'][vg_idx]
-            w = vg_data['image_widths'][vg_idx]
-
-            img = torch.tensor(img[:, :h, :w] / 255., dtype=torch.float32)  # get rid of zero padding
-
-            if self.transform is not None:
-                img = self.transform(img)
-
-            first_box_idx = vg_data['img_to_first_box'][vg_idx]
-            last_box_idx = vg_data['img_to_last_box'][vg_idx]
-
-            boxes = torch.as_tensor(vg_data['boxes'][first_box_idx: last_box_idx+1], dtype=torch.float32)
-            caps = torch.as_tensor(vg_data['captions'][first_box_idx: last_box_idx+1], dtype=torch.long)
-            caps_len = torch.as_tensor(vg_data['lengths'][first_box_idx: last_box_idx+1], dtype=torch.long)
-
-            targets = {
-                'boxes': boxes,
-                'caps': caps,
-                'caps_len': caps_len,
-            }
-
-            info = {
-                'idx': vg_idx,
-                'dir': self.look_up_tables['idx_to_directory'][vg_idx],
-                'file_name': self.look_up_tables['idx_to_filename'][vg_idx]
-            }
-
-        return img, targets, info
-
-    def __len__(self):
-
-        if self.dataset_type:
-            return len(self.look_up_tables['split'][self.dataset_type])
-        else:
-            return len(self.look_up_tables['filename_to_idx'])
