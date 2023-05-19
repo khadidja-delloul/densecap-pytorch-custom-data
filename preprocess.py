@@ -157,7 +157,10 @@ def encode_boxes(data, image_data, all_image_ids):
         for region in img['regions']:
             if region['tokens'] is None:
                 continue
-
+            for point in region['points']:
+                x = point['x']
+                y = point['y']
+                  
             x1, y1 = region['x'], region['y']
             if x1 < 0: x1 = 0
             if y1 < 0: y1 = 0
