@@ -93,17 +93,18 @@ class TheatreDataset(Dataset):
             else:
                 img = transforms.ToTensor()(img)
 #                 depth = transforms.ToTensor()(depth)
+          
 
-            first_region_idx = theatre_data['img_to_first_region'][theatre_idx]
-            last_region_idx = theatre_data['img_to_last_region'][theatre_idx]
+            first_region_idx = theatre_data['img_to_first_box'][theatre_idx]
+            last_region_idx = theatre_data['img_to_last_box'][theatre_idx]
 
-            regions = torch.as_tensor(theatre_data['regions'][first_region_idx: last_region_idx + 1],
+            regions = torch.as_tensor(theatre_data['boxes'][first_region_idx: last_region_idx + 1],
                                       dtype=torch.float32)
             caps = torch.as_tensor(theatre_data['captions'][first_region_idx: last_region_idx + 1], dtype=torch.long)
             caps_len = torch.as_tensor(theatre_data['lengths'][first_region_idx: last_region_idx + 1], dtype=torch.long)
 
             targets = {
-                'regions': regions,
+                'boxes': regions,
                 'caps': caps,
                 'caps_len': caps_len,
             }
