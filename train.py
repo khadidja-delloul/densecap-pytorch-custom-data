@@ -25,8 +25,8 @@ USE_TB = True
 CONFIG_PATH = './model_params'
 MODEL_NAME = 'train_all_val_all_bz_2_epoch_10_inject_init'
 IMG_DIR_ROOT = './data/rgb'
-VG_DATA_PATH = './data/theatre-regions-lite.h5'
-LOOK_UP_TABLES_PATH = './data/theatre-regions-dicts-lite.pkl'
+VG_DATA_PATH = './data/custom-regions-lite.h5'
+LOOK_UP_TABLES_PATH = './data/custom-regions-dicts-lite.pkl'
 MAX_TRAIN_IMAGE = -1  # if -1, use all images in train set
 MAX_VAL_IMAGE = -1
 
@@ -112,8 +112,8 @@ def train(args):
     model.roi_heads.box_roi_pool.forward = \
         amp.half_function(model.roi_heads.box_roi_pool.forward)
 
-    train_set = DenseCapDataset(IMG_DIR_ROOT, VG_DATA_PATH, LOOK_UP_TABLES_PATH, dataset_type='train')
-    val_set = DenseCapDataset(IMG_DIR_ROOT, VG_DATA_PATH, LOOK_UP_TABLES_PATH, dataset_type='val')
+    train_set = TheatreDataset(IMG_DIR_ROOT, VG_DATA_PATH, LOOK_UP_TABLES_PATH, dataset_type='train')
+    val_set = TheatreDataset(IMG_DIR_ROOT, VG_DATA_PATH, LOOK_UP_TABLES_PATH, dataset_type='val')
     idx_to_token = train_set.look_up_tables['idx_to_token']
 
     if MAX_TRAIN_IMAGE > 0:
@@ -121,8 +121,8 @@ def train(args):
     if MAX_VAL_IMAGE > 0:
         val_set = Subset(val_set, range(MAX_VAL_IMAGE))
 
-    train_loader = DataLoaderPFG(train_set, batch_size=args['batch_size'], shuffle=True, num_workers=2,
-                                 pin_memory=True, collate_fn=DenseCapDataset.collate_fn)
+    train_loader = TheatreDataLoaderPFG(train_set, batch_size=args['batch_size'], shuffle=True, num_workers=2,
+                                 pin_memory=True, collate_fn=TheatreDataset.collate_fn)
 
     iter_counter = 0
     best_map = 0.
