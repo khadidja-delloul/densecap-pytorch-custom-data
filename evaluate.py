@@ -8,8 +8,8 @@ from model.evaluator import DenseCapEvaluator
 def quality_check(model, dataset, idx_to_token, device, max_iter=-1):
 
     model.to(device)
-    data_loader = DataLoaderPFG(dataset, batch_size=1, shuffle=False, num_workers=1,
-                                 pin_memory=True, collate_fn=DenseCapDataset.collate_fn)
+    data_loader = TheatreDataLoaderPFG(dataset, batch_size=1, shuffle=False, num_workers=1,
+                                 pin_memory=True, collate_fn=TheatreDataset.collate_fn)
 
     print('[quality check]')
     for i, (img, targets, info) in enumerate(data_loader):
