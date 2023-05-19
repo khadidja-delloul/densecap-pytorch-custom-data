@@ -46,7 +46,7 @@ class TheatreDataset(Dataset):
 
         return transform
 
-    def __init__(self, img_dir_root, theatre_data_path, depth_img_dir_root, look_up_tables_path, dataset_type=None,
+    def __init__(self, img_dir_root, theatre_data_path, look_up_tables_path, dataset_type=None,
                  transform=None):
 
         assert dataset_type in {None, 'train', 'test', 'val'}
@@ -55,7 +55,7 @@ class TheatreDataset(Dataset):
 
         self.img_dir_root = img_dir_root
         self.theatre_data_path = theatre_data_path
-        self.depth_img_dir_root = depth_img_dir_root
+        # self.depth_img_dir_root = depth_img_dir_root
         self.look_up_tables_path = look_up_tables_path
         self.dataset_type = dataset_type  # if dataset_type is None, all data will be used
         self.transform = transform
@@ -81,8 +81,8 @@ class TheatreDataset(Dataset):
             img_path = os.path.join(self.img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
                                     self.look_up_tables['idx_to_filename'][theatre_idx])
 
-            depth_path = os.path.join(self.depth_img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
-                                      self.look_up_tables['idx_to_filename'][theatre_idx])
+            # depth_path = os.path.join(self.depth_img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
+                                      # self.look_up_tables['idx_to_filename'][theatre_idx])
 
             img = Image.open(img_path).convert("RGB")
 #             depth_path = depth_path.replace("jpg", "jpeg")
@@ -120,11 +120,7 @@ class TheatreDataset(Dataset):
     
     
     def __len__(self):
-
-        if self.dataset_type:
-            return len(self.look_up_tables['split'][self.dataset_type])
-        else:
-            return len(self.look_up_tables['filename_to_idx'])
+      return len(self.look_up_tables['filename_to_idx'])
 
 
 
