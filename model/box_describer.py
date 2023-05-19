@@ -113,7 +113,7 @@ class BoxDescriber(nn.Module):
             predicts[keep, i+1] = pred.log_softmax(dim=-1).argmax(dim=-1)
 
             non_stop = predicts[keep, i+1] != self.special_idx['<eos>']
-            keep = keep[non_stop]  # update unfinished indices
+            keep = keep[non_stop.cpu()]  # update unfinished indices
             if keep.nelement() == 0:  # stop if all finished
                 break
             else:
