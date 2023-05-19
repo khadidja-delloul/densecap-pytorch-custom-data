@@ -20,6 +20,9 @@ torch.manual_seed(42)
 torch.cuda.manual_seed(42)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+PATH = ""
+
+
 MAX_EPOCHS = 10
 USE_TB = True
 CONFIG_PATH = './model_params'
@@ -128,14 +131,12 @@ def train(args):
     best_map = 0.
     results = -1
     
-    # checkpoint = torch.load(PATH)
-    # model.load_state_dict(checkpoint['model'])
-    # optimizer.load_state_dict(checkpoint['optimizer'])
-    # iter_counter = checkpoint['iterations']
-    # results = checkpoint['results_on_val']
-    # best_loss = 4.661
-    # print(iter_counter)
-    
+    checkpoint = torch.load(PATH)
+    model.load_state_dict(checkpoint['model'])
+    optimizer.load_state_dict(checkpoint['optimizer'])
+    iter_counter = checkpoint['iterations']
+    results = checkpoint['results_on_val']
+
     
     # use tensorboard to track the loss
     if USE_TB:
