@@ -61,9 +61,9 @@ def caption_loss(caption_predicts, caption_gt, caption_length):
     # '<bos>' is not considered
     caption_length = torch.clamp(caption_length-1, min=0)
 
-    predict_pps = pack_padded_sequence(caption_predicts, caption_length, batch_first=True, enforce_sorted=False)
+    predict_pps = pack_padded_sequence(caption_predicts, caption_length.cpu(), batch_first=True, enforce_sorted=False)
 
-    target_pps = pack_padded_sequence(caption_gt[:, 1:], caption_length, batch_first=True, enforce_sorted=False)
+    target_pps = pack_padded_sequence(caption_gt[:, 1:], caption_length.cpu(), batch_first=True, enforce_sorted=False)
 
     return F.cross_entropy(predict_pps.data, target_pps.data)
 
