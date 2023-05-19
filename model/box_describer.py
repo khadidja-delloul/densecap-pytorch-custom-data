@@ -65,7 +65,7 @@ class BoxDescriber(nn.Module):
         if self.fusion_type == 'init_inject':
             _, (h0, c0) = self.rnn(feat_emb.unsqueeze(1), (h0, c0))  # first input projected feat emb to rnn
 
-        rnn_input_pps = pack_padded_sequence(word_emb, lengths=cap_lens, batch_first=True, enforce_sorted=False)
+        rnn_input_pps = pack_padded_sequence(word_emb, lengths=cap_lens.cpu(), batch_first=True, enforce_sorted=False)
 
         rnn_output_pps, _ = self.rnn(rnn_input_pps, (h0, c0))
 
