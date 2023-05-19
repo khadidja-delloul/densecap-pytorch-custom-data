@@ -46,7 +46,7 @@ def quantity_check(model, dataset, idx_to_token, device, max_iter=-1, verbose=Tr
 
     model.to(device)
     data_loader = TheatreDataLoaderPFG(dataset, batch_size=4, shuffle=False, num_workers=2,
-                                 pin_memory=True, collate_fn=TheatreDenseCapDataset.collate_fn)
+                                 pin_memory=True, collate_fn=TheatreDataset.collate_fn)
 
     evaluator = DenseCapEvaluator(list(model.roi_heads.box_describer.special_idx.keys()))
 
