@@ -230,7 +230,7 @@ def build_directory_dict(data, image_data, all_image_ids):
         img_info = image_data[all_image_ids.index(img['id'])]
         assert img['id'] == img_info['image_id'], 'id mismatch'
 
-        idx_to_directory[next_idx] = re.search('(VG.*)/(.*.jpg)$', img_info['url']).group(1)
+        idx_to_directory[next_idx] = "custom"
         next_idx += 1
 
     return idx_to_directory
