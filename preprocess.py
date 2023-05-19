@@ -310,55 +310,30 @@ def split_filter_captions(data, max_token_length, tokens_type, verbose=True):
         print('Skipped {} captions for being too long'.format(captions_removed))
 
 
-def encode_splits(data, split_data):
-    """ Encode splits by mappings """
-    id_to_split = {}
-    for split, idxs in split_data.items():
-        for idx in idxs:
-            id_to_split[idx] = split
-
-    split_dict = {k:list() for k in split_data.keys()}
-
-    for i, img in enumerate(data):
-        split_dict[id_to_split[img['id']]].append(i)
-
-    return split_dict
-
-
-def filter_images(data, split_data):
-    """ Keep only images that are in some split and have some captions """
-    all_split_ids = set()
-    for split_name, ids in split_data.items():
-        all_split_ids.update(ids)
-    new_data = []
-    for img in data:
-        keep = img['id'] in all_split_ids and len(img['regions']) > 0
-        if keep:
-            new_data.append(img)
-    return new_data
-
-
 def main(args):
     # read in the data
     with open(args.region_data, 'r') as f:
         data = json.load(f)
-    with open(args.split_json, 'r') as f:
-        split_data = json.load(f)  # {'train':[...], 'test':[...], 'val':[...]}
+    # with open(args.split_json, 'r') as f:
+    #     split_data = json.load(f)  # {'train':[...], 'test':[...], 'val':[...]}
     with open(args.image_data, 'r') as f:
         image_data = json.load(f)
+
+    image_data = image_data["images"]
+    data = data["images"]
 
     all_image_ids = [image_data[i]['image_id'] for i in range(len(image_data))]
 
     # Only keep images that are in a split
     print(f'There are {len(data)} images total')
-    data = filter_images(data, split_data)  # data为vg数据集定义的region description的格式的列表
-    print(f'After filtering for splits there are {len(data)} images')
+    # data = filter_images(data, split_data)  # data为vg数据集定义的region description的格式的列表
+    # print(f'After filtering for splits there are {len(data)} images')
 
     if args.max_images > 0:
         data = data[:args.max_images]
 
     # add split information
-    split = encode_splits(data, split_data)  # dict {'train': [idx, ...], 'val': [...], 'test': [...]}
+    # split = encode_splits(data, split_data)  # dict {'train': [idx, ...], 'val': [...], 'test': [...]}
 
     # create the output hdf5 file handle
     with h5py.File(args.h5_output, 'w') as f:
@@ -401,7 +376,7 @@ def main(args):
         'filename_to_idx': filename_to_idx,
         'idx_to_filename': idx_to_filename,
         'idx_to_directory': idx_to_directory,
-        'split': split,
+        # 'split': split,
     }
     with open(args.pickle_output, 'wb') as f:
         pickle.dump(pickle_struct, f)
@@ -412,11 +387,11 @@ if __name__ == '__main__':
 
     # INPUT settings
     parser.add_argument('--region_data',
-                        default='data/region_descriptions.json',
+                        default='theatre/region_descriptions.json',
                         help='Input JSON file with regions and captions')
 
     parser.add_argument('--image_data',
-                        default='data/image_data.json',
+                        default='theatre/image_data.json',
                         help='Input JSON file with image url weight and height')
 #     parser.add_argument('--split_json',
 #                         default='info/densecap_splits.json',
