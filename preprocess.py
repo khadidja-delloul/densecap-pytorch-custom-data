@@ -409,14 +409,15 @@ if __name__ == '__main__':
 
     # INPUT settings
     parser.add_argument('--region_data',
-                        default='data/visual-genome/region_descriptions.json',
+                        default='data/region_descriptions.json',
                         help='Input JSON file with regions and captions')
+
     parser.add_argument('--image_data',
-                        default='data/visual-genome/image_data.json',
+                        default='data/image_data.json',
                         help='Input JSON file with image url weight and height')
-    parser.add_argument('--split_json',
-                        default='info/densecap_splits.json',
-                        help='JSON file of splits')
+#     parser.add_argument('--split_json',
+#                         default='info/densecap_splits.json',
+#                         help='JSON file of splits')
 
     # OUTPUT settings
     parser.add_argument('--pickle_output',
