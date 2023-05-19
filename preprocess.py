@@ -157,31 +157,38 @@ def encode_boxes(data, image_data, all_image_ids):
         for region in img['regions']:
             if region['tokens'] is None:
                 continue
+            X = []
+            Y = []
             for point in region['points']:
-                x = point['x']
-                y = point['y']
-                  
-            x1, y1 = region['x'], region['y']
-            if x1 < 0: x1 = 0
-            if y1 < 0: y1 = 0
-            x2, y2 = x1 + region['width'], y1 + region['height']
+                X.append(point['x'])
+                Y.append(point['y'])
+              
+            x1 = np.min(X) 
+            x2 = np.max(X)
+            y1 = np.min(Y) 
+            y2 = np.max(Y) 
+
+            # x1, y1 = region['x'], region['y']
+            # if x1 < 0: x1 = 0
+            # if y1 < 0: y1 = 0
+            # x2, y2 = x1 + region['width'], y1 + region['height']
 
             # sanity check
-            try:
-                assert x1 <= img_info['width'], 'invalid x1 coordinate {} > {} in image_id:{} box_id:{}'.format(x1, img_info['width'], img['id'], region['region_id'])
-                assert y1 <= img_info['height'], 'invalid y1 coordinate {} > {} in image_id:{} box_id:{}'.format(y1, img_info['height'], img['id'], region['region_id'])
-                assert x2 <= img_info['width'], 'invalid x2 coordinate {} > {} in image_id:{} box_id:{}'.format(x2, img_info['width'], img['id'], region['region_id'])
-                assert y2 <= img_info['height'], 'invalid y2 coordinate {} > {} in image_id:{} box_id:{}'.format(y2, img_info['height'], img['id'], region['region_id'])
-            except AssertionError as e:
-                print(e)
+            # try:
+            #     assert x1 <= img_info['width'], 'invalid x1 coordinate {} > {} in image_id:{} box_id:{}'.format(x1, img_info['width'], img['id'], region['region_id'])
+            #     assert y1 <= img_info['height'], 'invalid y1 coordinate {} > {} in image_id:{} box_id:{}'.format(y1, img_info['height'], img['id'], region['region_id'])
+            #     assert x2 <= img_info['width'], 'invalid x2 coordinate {} > {} in image_id:{} box_id:{}'.format(x2, img_info['width'], img['id'], region['region_id'])
+            #     assert y2 <= img_info['height'], 'invalid y2 coordinate {} > {} in image_id:{} box_id:{}'.format(y2, img_info['height'], img['id'], region['region_id'])
+            # except AssertionError as e:
+            #     print(e)
 
-                print('orignal bbox coordinate ', (x1, y1, x2, y2))
-                # clamp to image
-                if x1 > img_info['width']: x1 = (img_info['width']- 1) - region['width']
-                if y1 > img_info['height']: y1 = (img_info['height'] - 1) - region['height']
-                if x2 > img_info['width']: x2 = img_info['width']- 1
-                if y2 > img_info['height']: y2 = img_info['height'] - 1
-                print('clamped bbox coordinate ', (x1, y1, x2, y2))
+            #     print('orignal bbox coordinate ', (x1, y1, x2, y2))
+            #     # clamp to image
+            #     if x1 > img_info['width']: x1 = (img_info['width']- 1) - region['width']
+            #     if y1 > img_info['height']: y1 = (img_info['height'] - 1) - region['height']
+            #     if x2 > img_info['width']: x2 = img_info['width']- 1
+            #     if y2 > img_info['height']: y2 = img_info['height'] - 1
+            #     print('clamped bbox coordinate ', (x1, y1, x2, y2))
 
             box = np.asarray([x1, y1, x2, y2], dtype=np.int32)
             all_boxes.append(box)
