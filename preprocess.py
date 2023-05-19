@@ -421,10 +421,10 @@ if __name__ == '__main__':
 
     # OUTPUT settings
     parser.add_argument('--pickle_output',
-                        default='data/VG-regions-dicts-lite.pkl',
+                        default='data/custom-regions-dicts-lite.pkl',
                         help='Path to output pickle file')
     parser.add_argument('--h5_output',
-                        default='data/VG-regions-lite.h5',
+                        default='data/custom-regions-lite.h5',
                         help='Path to output HDF5 file')
 
     # OPTIONS
