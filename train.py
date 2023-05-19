@@ -7,7 +7,7 @@ from torch.utils.data.dataset import Subset
 from torchvision.models.detection.faster_rcnn import fasterrcnn_resnet50_fpn
 from torch.utils.tensorboard import SummaryWriter
 
-from utils.data_loader import DenseCapDataset, DataLoaderPFG
+from utils.data_loader import TheatreDataset, TheatreDataLoaderPFG
 from model.densecap import densecap_resnet50_fpn
 
 from apex import amp
