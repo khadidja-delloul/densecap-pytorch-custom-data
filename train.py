@@ -24,9 +24,9 @@ MAX_EPOCHS = 10
 USE_TB = True
 CONFIG_PATH = './model_params'
 MODEL_NAME = 'train_all_val_all_bz_2_epoch_10_inject_init'
-IMG_DIR_ROOT = './data/visual-genome'
-VG_DATA_PATH = './data/VG-regions-lite.h5'
-LOOK_UP_TABLES_PATH = './data/VG-regions-dicts-lite.pkl'
+IMG_DIR_ROOT = './data/rgb'
+VG_DATA_PATH = './data/theatre-regions-lite.h5'
+LOOK_UP_TABLES_PATH = './data/theatre-regions-dicts-lite.pkl'
 MAX_TRAIN_IMAGE = -1  # if -1, use all images in train set
 MAX_VAL_IMAGE = -1
 
