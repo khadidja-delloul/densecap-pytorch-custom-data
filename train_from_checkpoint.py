@@ -20,7 +20,8 @@ torch.manual_seed(42)
 torch.cuda.manual_seed(42)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-PATH = ""
+PATH = "./model_params/train_all_val_all_bz_2_epoch_10_inject_init"
+
 
 
 MAX_EPOCHS = 10
