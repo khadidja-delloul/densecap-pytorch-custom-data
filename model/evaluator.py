@@ -8,6 +8,8 @@ from nlgeval.pycocoevalcap.bleu.bleu import Bleu
 from nlgeval.pycocoevalcap.rouge.rouge import Rouge
 from nlgeval.pycocoevalcap.cider.cider import Cider
 
+import numpy as np
+
 def merge_boxes(boxes, thr):
     """
 
@@ -272,6 +274,10 @@ class DenseCapEvaluator(object):
             'ap_breakdown': ap_results,
             'detmap': detmap,
             'det_breakdown': det_results,
+            'meteor': round(np.mean(meteors), 3),
+            'bleu': round(np.mean(bleus[0]), 3),
+            'rouge': round(np.mean(rouges), 3),
+            'cider': round(np.mean(ciders), 3),
         }
 
         return results
