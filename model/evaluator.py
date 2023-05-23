@@ -4,7 +4,9 @@ import torch
 import torchvision.ops.boxes as box_ops
 
 from nlgeval.pycocoevalcap.meteor.meteor import Meteor
-
+from nlgeval.pycocoevalcap.bleu.bleu import Bleu
+from nlgeval.pycocoevalcap.rouge.rouge import Rouge
+from nlgeval.pycocoevalcap.cider.cider import Cider
 
 def merge_boxes(boxes, thr):
     """
@@ -95,7 +97,24 @@ class DenseCapEvaluator(object):
         meteor, meteor_scores = meteor_scorer.compute_score(references, candidates)
         meteor_scorer.close()
 
-        return meteor, meteor_scores
+
+        bleu_scorer = Bleu()
+        bleu, bleu_scores = bleu_scorer.compute_score(references, candidates)
+        
+
+        rouge_scorer = Rouge()
+        rouge, rouge_scores = rouge_scorer.compute_score(references, candidates)
+        
+
+        cider_scorer = Cider()
+        cider, cider_scores = cider_scorer.compute_score(references, candidates)
+        
+
+
+        return meteor_scores, bleu_scores, rouge_scores, cider_scores
+
+
+        # return meteor, meteor_scores
 
 
     def add_result(self, scores, boxes, text, target_boxes, target_text, img_info=None):
@@ -169,15 +188,16 @@ class DenseCapEvaluator(object):
         # concatenate everything across all images
         scores = torch.cat(self.all_scores, dim=0)
         # evaluate all records and get their METEOR scores
-        _, meteors = self.score_captions()
+        # _, meteors = self.score_captions()
+        meteors, bleus, rouges, ciders = self.score_captions()
 
         if verbose:
             for k, record in enumerate(self.records):
-                if record['iou'] > 0 and record['ok'] == 1 and k % 1000 == 0:
+                if record['iou'] > 0 and record['ok'] == 1 and k % 10 == 0:
                     assert isinstance(record['references'], list)
 
-                    info_txt = 'IOU: {:.3f} OK: {} SCORE: {:.3F} METEOR: {:.3f}'.format(record['iou'], record['ok'],
-                                                                                        scores[k].item(), meteors[k])
+                    info_txt = 'IOU: {:.3f} OK: {} SCORE: {:.3F} METEOR: {:.3f} BLEU: {:.3f} ROUGE: {:.3f} CIDEr: {:.3f}'.format(record['iou'], record['ok'],
+                                                                                        scores[k].item(), meteors[k], bleus[0][k], rouges[k], ciders[k])
                     if record['img_info'] is not None:
                         info_txt = 'IMG_INFO: {} '.format(record['img_info']) + info_txt
                     else:
