@@ -62,7 +62,7 @@ class TheatreDataset(Dataset):
 
         # === load data here ====
         self.look_up_tables = pickle.load(open(look_up_tables_path, 'rb'))
-
+    # we retain on whole data
     # def set_dataset_type(self, dataset_type, verbose=True):
     #
     #     assert dataset_type in {None, 'train', 'test', 'val'}
@@ -81,18 +81,13 @@ class TheatreDataset(Dataset):
             img_path = os.path.join(self.img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
                                     self.look_up_tables['idx_to_filename'][theatre_idx])
 
-            # depth_path = os.path.join(self.depth_img_dir_root, self.look_up_tables['idx_to_directory'][theatre_idx],
-                                      # self.look_up_tables['idx_to_filename'][theatre_idx])
 
             img = Image.open(img_path).convert("RGB")
-#             depth_path = depth_path.replace("jpg", "jpeg")
-#             depth = Image.open(depth_path)
 
             if self.transform is not None:
                 img = self.transform(img)
             else:
                 img = transforms.ToTensor()(img)
-#                 depth = transforms.ToTensor()(depth)
           
 
             first_region_idx = theatre_data['img_to_first_box'][theatre_idx]
@@ -115,7 +110,6 @@ class TheatreDataset(Dataset):
                 'file_name': self.look_up_tables['idx_to_filename'][theatre_idx]
             }
 
-#         return torch.cat((img, depth)), targets, info
         return img, targets, info
     
     
