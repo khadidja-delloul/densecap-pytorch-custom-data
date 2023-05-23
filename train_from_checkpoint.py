@@ -20,14 +20,13 @@ torch.manual_seed(42)
 torch.cuda.manual_seed(42)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-PATH = "./model_params/train_all_val_all_bz_2_epoch_10_inject_init_end.pth.tar"
-
+PATH = "/content/densecap-pytorch-custom-data/model_params/train_all_val_all_bz_2_epoch_10_inject_init_end.pth.tar"
 
 
 MAX_EPOCHS = 10
 USE_TB = True
 CONFIG_PATH = './model_params'
-MODEL_NAME = 'train_all_val_all_bz_2_epoch_10_inject_init.pth.tar'
+MODEL_NAME = 'train_all_val_all_bz_2_epoch_10_inject_init'
 IMG_DIR_ROOT = './data/rgb'
 VG_DATA_PATH = './data/custom-regions-lite.h5'
 LOOK_UP_TABLES_PATH = './data/custom-regions-dicts-lite.pkl'
@@ -193,6 +192,10 @@ def train(args):
                     if USE_TB:
                         writer.add_scalar('metric/map', results['map'], iter_counter)
                         writer.add_scalar('metric/det_map', results['detmap'], iter_counter)
+                        writer.add_scalar('caption/meteor', results['meteor'], iter_counter)
+                        writer.add_scalar('caption/bleu', results['bleu'], iter_counter)
+                        writer.add_scalar('caption/rouge', results['rouge'], iter_counter)
+                        writer.add_scalar('caption/cider', results['cider'], iter_counter)
 
                 except AssertionError as e:
                     print('[INFO]: evaluation failed at epoch {}'.format(epoch))
