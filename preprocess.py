@@ -423,8 +423,9 @@ if __name__ == '__main__':
     parser.add_argument('--max_token_length',
                         default=15, type=int,
                         help="Set to 0 to disable filtering")
+    # modify because custom dataset size is smaller than VG
     parser.add_argument('--min_token_instances',
-                        default=15, type=int,
+                        default=1, type=int,
                         help="When token appears less than this times it will be mapped to <UNK>")
     parser.add_argument('--tokens_type', default='words',
                         help="Words|chars for word or char split in captions")
