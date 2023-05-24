@@ -206,7 +206,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Do dense captioning')
     parser.add_argument('--config_json', type=str, help="path of the json file which stored model configuration")
-    parser.add_argument('--lut_path', type=str, default='./data/custom-regions-dicts-lite.pkl'', help='look up table path')
+    parser.add_argument('--lut_path', type=str, default='./data/custom-regions-dicts-lite.pkl', help='look up table path')
     parser.add_argument('--model_checkpoint', type=str, help="path of the trained model checkpoint")
     parser.add_argument('--img_path', type=str, help="path of images, should be a file or a directory with only images")
     parser.add_argument('--result_dir', type=str, default='.',
