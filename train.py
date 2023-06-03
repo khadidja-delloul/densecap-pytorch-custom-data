@@ -173,7 +173,7 @@ def train(args):
 
             if iter_counter > 0 and iter_counter % 20000 == 0:
                 try:
-                    quanlity_check(model, val_set, idx_to_token, device, max_iter=-1)
+                    quality_check(model, val_set, idx_to_token, device, max_iter=-1)
                     results = quantity_check(model, val_set, idx_to_token, device, max_iter=-1, verbose=True)
                     if results['map'] > best_map:
                         best_map = results['map']
